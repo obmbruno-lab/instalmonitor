@@ -21,13 +21,17 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      toast.success('Login realizado com sucesso!');
-      navigate('/dashboard');
+      // Use setTimeout to ensure toast is displayed before navigation
+      // This prevents the removeChild error caused by React unmounting
+      // the component while Sonner is still manipulating the DOM
+      setTimeout(() => {
+        toast.success('Login realizado com sucesso!');
+        navigate('/dashboard', { replace: true });
+      }, 100);
     } else {
       toast.error(result.message);
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

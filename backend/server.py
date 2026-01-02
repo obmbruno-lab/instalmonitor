@@ -710,7 +710,7 @@ def compress_base64_image(base64_string: str, max_size_kb: int = 300, max_dimens
         return base64_string
 
 async def fetch_holdprint_jobs(branch: str):
-    """Fetch jobs from Holdprint API - últimos 7 dias, excluindo finalizados"""
+    """Fetch jobs from Holdprint API - últimos 6 meses"""
     api_key = HOLDPRINT_API_KEY_POA if branch == "POA" else HOLDPRINT_API_KEY_SP
     
     if not api_key:
@@ -718,9 +718,9 @@ async def fetch_holdprint_jobs(branch: str):
     
     headers = {"x-api-key": api_key}
     
-    # Calcular datas: últimos 7 dias
+    # Calcular datas: últimos 6 meses
     end_date = datetime.now(timezone.utc)
-    start_date = end_date - timedelta(days=7)
+    start_date = end_date - timedelta(days=180)
     
     # Formatar datas no padrão YYYY-MM-DD
     start_date_str = start_date.strftime("%Y-%m-%d")
@@ -747,12 +747,10 @@ async def fetch_holdprint_jobs(branch: str):
         elif isinstance(data, list):
             jobs = data
         
-        # Filtrar jobs NÃO finalizados (isFinalized = false ou não existe)
-        filtered_jobs = [job for job in jobs if not job.get('isFinalized', False)]
+        # Retornar todos os jobs (incluindo finalizados para histórico)
+        logger.info(f"Holdprint {branch}: {len(jobs)} jobs encontrados (últimos 6 meses: {start_date_str} a {end_date_str})")
         
-        logger.info(f"Holdprint {branch}: {len(jobs)} jobs encontrados, {len(filtered_jobs)} não finalizados (últimos 7 dias: {start_date_str} a {end_date_str})")
-        
-        return filtered_jobs
+        return jobs
     except requests.RequestException as e:
         logger.error(f"Error fetching from Holdprint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching from Holdprint: {str(e)}")
@@ -1459,7 +1457,7 @@ async def update_assignment_status(job_id: str, item_index: int, status_update: 
 # ============ CHECK-IN/OUT ROUTES ============
 
 # Create uploads directory if it doesn't exist
-UPLOAD_DIR = Path("/app/uploads")
+UPLOAD_DIR = Path("/home/ubuntu/visual-clone-35/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 @api_router.post("/checkins", response_model=CheckIn)

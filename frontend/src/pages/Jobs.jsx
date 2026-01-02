@@ -274,7 +274,7 @@ const Jobs = () => {
           {filteredJobs.map((job) => (
             <Card
               key={job.id}
-              onClick={() => navigate(`/jobs/${job.id}`)}
+              onClick={() => navigate(user?.role === 'installer' ? `/installer/job/${job.id}` : `/jobs/${job.id}`)}
               className="bg-card border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
               data-testid={`job-card-${job.id}`}
             >

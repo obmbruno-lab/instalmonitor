@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000') + '/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
