@@ -1457,8 +1457,8 @@ async def update_assignment_status(job_id: str, item_index: int, status_update: 
 # ============ CHECK-IN/OUT ROUTES ============
 
 # Create uploads directory if it doesn't exist
-UPLOAD_DIR = Path("/home/ubuntu/visual-clone-35/backend/uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR = Path(__file__).parent / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @api_router.post("/checkins", response_model=CheckIn)
 async def create_checkin(
