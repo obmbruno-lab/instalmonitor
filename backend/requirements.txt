@@ -15,3 +15,4 @@ resend==0.7.0
 email-validator==2.1.0
 certifi==2023.11.17
 dnspython==2.4.2
+openpyxl==3.1.2
