@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { CheckCircle, MapPin, Clock, Image, Eye, Search, Filter } from 'lucide-react';
+import { CheckCircle, MapPin, Clock, Image, Eye, Search, Filter, Ruler, Pause } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Checkins = () => {
@@ -30,21 +30,23 @@ const Checkins = () => {
 
   const loadData = async () => {
     try {
-      const [checkinsRes, jobsRes, installersRes] = await Promise.all([
-        api.getCheckins(),
+      // Buscar item-checkins (check-ins por item) em vez de checkins antigos
+      const [itemCheckinsRes, jobsRes, installersRes] = await Promise.all([
+        api.getItemCheckins(), // Busca todos os item-checkins
         api.getJobs(),
         api.getInstallers()
       ]);
       
       // Sort by most recent
-      const sortedCheckins = checkinsRes.data.sort((a, b) => 
+      const sortedCheckins = (itemCheckinsRes.data || []).sort((a, b) => 
         new Date(b.checkin_at) - new Date(a.checkin_at)
       );
       
       setCheckins(sortedCheckins);
-      setJobs(jobsRes.data);
-      setInstallers(installersRes.data);
+      setJobs(jobsRes.data || []);
+      setInstallers(installersRes.data || []);
     } catch (error) {
+      console.error('Erro ao carregar check-ins:', error);
       toast.error('Erro ao carregar check-ins');
     } finally {
       setLoading(false);
@@ -73,17 +75,42 @@ const Checkins = () => {
     return installer?.full_name || 'N/A';
   };
 
+  const getProductName = (checkin) => {
+    // Tenta obter o nome do produto do item-checkin
+    return checkin.product_name || checkin.family_name || `Item ${checkin.item_index + 1}`;
+  };
+
   // Filter checkins
   const filteredCheckins = checkins.filter(checkin => {
     const jobTitle = getJobTitle(checkin.job_id).toLowerCase();
     const installerName = getInstallerName(checkin.installer_id).toLowerCase();
+    const productName = getProductName(checkin).toLowerCase();
     const matchesSearch = jobTitle.includes(searchTerm.toLowerCase()) || 
-                         installerName.includes(searchTerm.toLowerCase());
+                         installerName.includes(searchTerm.toLowerCase()) ||
+                         productName.includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || checkin.status === statusFilter;
     const matchesInstaller = installerFilter === 'all' || checkin.installer_id === installerFilter;
     
     return matchesSearch && matchesStatus && matchesInstaller;
   });
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'completed': return 'Completo';
+      case 'in_progress': return 'Em andamento';
+      case 'paused': return 'Pausado';
+      default: return status;
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'completed': return 'bg-green-500/20 text-green-500 border border-green-500/20';
+      case 'in_progress': return 'bg-blue-500/20 text-blue-500 border border-blue-500/20';
+      case 'paused': return 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/20';
+      default: return 'bg-gray-500/20 text-gray-500 border border-gray-500/20';
+    }
+  };
 
   if (loading) {
     return (
@@ -101,7 +128,7 @@ const Checkins = () => {
           Check-ins
         </h1>
         <p className="text-muted-foreground mt-2">
-          Visualize todos os check-ins realizados
+          Visualize todos os check-ins realizados por item
         </p>
       </div>
 
@@ -119,7 +146,7 @@ const Checkins = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por job ou instalador..."
+                placeholder="Buscar por job, instalador ou produto..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-white/5 border-white/10 text-white"
@@ -134,6 +161,7 @@ const Checkins = () => {
               <SelectContent>
                 <SelectItem value="all">Todos os status</SelectItem>
                 <SelectItem value="in_progress">Em andamento</SelectItem>
+                <SelectItem value="paused">Pausado</SelectItem>
                 <SelectItem value="completed">Completo</SelectItem>
               </SelectContent>
             </Select>
@@ -184,6 +212,9 @@ const Checkins = () => {
                     <CardTitle className="text-lg text-white line-clamp-1">
                       {getJobTitle(checkin.job_id)}
                     </CardTitle>
+                    <p className="text-sm text-primary mt-1">
+                      {getProductName(checkin)}
+                    </p>
                     <p className="text-sm text-muted-foreground mt-1">
                       {getInstallerName(checkin.installer_id)}
                     </p>
@@ -191,16 +222,8 @@ const Checkins = () => {
                       {formatDate(checkin.checkin_at)}
                     </p>
                   </div>
-                  <span
-                    className={
-                      `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                        checkin.status === 'completed'
-                          ? 'bg-green-500/20 text-green-500 border border-green-500/20'
-                          : 'bg-blue-500/20 text-blue-500 border border-blue-500/20'
-                      }`
-                    }
-                  >
-                    {checkin.status === 'completed' ? 'Completo' : 'Em andamento'}
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusClass(checkin.status)}`}>
+                    {getStatusLabel(checkin.status)}
                   </span>
                 </div>
               </CardHeader>
@@ -230,17 +253,49 @@ const Checkins = () => {
                   </div>
                 )}
 
+                {/* m² installed */}
+                {checkin.installed_m2 && checkin.installed_m2 > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Ruler className="h-4 w-4 text-purple-400" />
+                    <span className="text-xs">{checkin.installed_m2.toFixed(2)} m² instalados</span>
+                  </div>
+                )}
+
                 {/* Duration if completed */}
-                {checkin.status === 'completed' && checkin.duration_minutes && (
+                {checkin.status === 'completed' && (checkin.net_duration_minutes || checkin.duration_minutes) && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4 text-green-400" />
-                    <span className="text-xs">{checkin.duration_minutes} minutos</span>
+                    <span className="text-xs">
+                      {checkin.net_duration_minutes || checkin.duration_minutes} min
+                      {checkin.total_pause_minutes > 0 && (
+                        <span className="text-yellow-400 ml-1">
+                          ({checkin.total_pause_minutes} min pausas)
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {/* Paused indicator */}
+                {checkin.status === 'paused' && (
+                  <div className="flex items-center gap-2 text-sm text-yellow-400">
+                    <Pause className="h-4 w-4" />
+                    <span className="text-xs">Pausado</span>
+                  </div>
+                )}
+
+                {/* Productivity if available */}
+                {checkin.productivity_m2_h && checkin.productivity_m2_h > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className="text-xs text-green-400">
+                      Produtividade: {checkin.productivity_m2_h.toFixed(2)} m²/h
+                    </span>
                   </div>
                 )}
 
                 {/* View Details Button */}
                 <Button
-                  onClick={() => navigate(`/checkin-viewer/${checkin.id}`)}
+                  onClick={() => navigate(`/checkin-viewer/${checkin.id}?type=item`)}
                   className="w-full bg-primary hover:bg-primary/90"
                   size="sm"
                 >
