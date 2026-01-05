@@ -36,6 +36,7 @@ const Metrics = () => {
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [familiesFromReport, setFamiliesFromReport] = useState([]);
   
   // Form states
   const [newFamily, setNewFamily] = useState({ name: '', description: '', color: '#3B82F6' });
@@ -66,16 +67,22 @@ const Metrics = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [metricsRes, familiesRes, productsRes, jobsRes] = await Promise.all([
+      const [metricsRes, familiesRes, productsRes, jobsRes, reportByFamilyRes] = await Promise.all([
         api.getProductivityMetrics(),
         api.getProductFamilies(),
         api.getProductsInstalled(),
-        api.getJobs()
+        api.getJobs(),
+        api.getReportByFamily()
       ]);
       setMetrics(metricsRes.data);
       setFamilies(familiesRes.data);
       setProducts(productsRes.data);
       setJobs(jobsRes.data);
+      
+      // Usar dados do relatório por família (mesma fonte que a tela de Relatórios)
+      if (reportByFamilyRes.data && reportByFamilyRes.data.families) {
+        setFamiliesFromReport(reportByFamilyRes.data.families);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -203,12 +210,7 @@ const Metrics = () => {
               Atualizar
             </Button>
             
-            {families.length === 0 && (
-              <Button onClick={seedFamilies} className="gap-2 bg-purple-600 hover:bg-purple-700">
-                <Layers className="h-4 w-4" />
-                Criar Famílias Padrão
-              </Button>
-            )}
+            {/* Botão removido - famílias agora são classificadas automaticamente dos jobs */}
 
             <Dialog open={showAddFamily} onOpenChange={setShowAddFamily}>
               <DialogTrigger asChild>
@@ -517,7 +519,7 @@ const Metrics = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* By Family */}
+          {/* By Family - Usando mesma fonte de dados da tela de Relatórios */}
           <TabsContent value="families">
             <Card className="bg-card border-white/5">
               <CardHeader>
@@ -525,48 +527,45 @@ const Metrics = () => {
                   <Palette className="h-5 w-5 text-primary" />
                   Produtividade por Família de Produtos
                 </CardTitle>
-                <CardDescription>Métricas consolidadas por tipo de material</CardDescription>
+                <CardDescription>Métricas consolidadas por tipo de material (sincronizado com Relatórios)</CardDescription>
               </CardHeader>
               <CardContent>
-                {Object.keys(metrics?.by_family || {}).length === 0 ? (
+                {familiesFromReport.length === 0 ? (
                   <div className="text-center py-12">
                     <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Nenhuma família cadastrada ainda.</p>
-                    <Button onClick={seedFamilies} className="mt-4 gap-2">
-                      <Plus className="h-4 w-4" />
-                      Criar Famílias Padrão
-                    </Button>
+                    <p className="text-muted-foreground">Nenhuma família encontrada nos jobs.</p>
+                    <p className="text-muted-foreground text-sm mt-2">Importe jobs da Holdprint para ver as famílias classificadas automaticamente.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Object.entries(metrics?.by_family || {}).map(([name, data]) => (
+                    {familiesFromReport.map((family) => (
                       <div
-                        key={name}
+                        key={family.name}
                         className="p-4 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-colors"
                       >
                         <div className="flex items-center gap-2 mb-3">
                           <div
                             className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: data.color }}
+                            style={{ backgroundColor: family.color || '#3B82F6' }}
                           />
-                          <h3 className="text-white font-semibold">{name}</h3>
+                          <h3 className="text-white font-semibold">{family.name}</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="bg-white/5 rounded p-2">
                             <p className="text-muted-foreground">Produtos</p>
-                            <p className="text-white font-bold">{data.total_products}</p>
+                            <p className="text-white font-bold">{family.total_products || 0}</p>
                           </div>
                           <div className="bg-white/5 rounded p-2">
                             <p className="text-muted-foreground">Área (m²)</p>
-                            <p className="text-white font-bold">{data.total_area_m2}</p>
+                            <p className="text-white font-bold">{(family.total_area || 0).toFixed(2)}</p>
                           </div>
                           <div className="bg-white/5 rounded p-2">
-                            <p className="text-muted-foreground">Tempo (h)</p>
-                            <p className="text-white font-bold">{data.total_time_hours}</p>
+                            <p className="text-muted-foreground">Jobs</p>
+                            <p className="text-white font-bold">{family.job_count || 0}</p>
                           </div>
-                          <div className="bg-primary/20 rounded p-2 border border-primary/30">
-                            <p className="text-primary">Prod. (m²/h)</p>
-                            <p className="text-white font-bold">{data.avg_productivity_m2_h}</p>
+                          <div className="bg-white/5 rounded p-2">
+                            <p className="text-muted-foreground">Quantidade</p>
+                            <p className="text-white font-bold">{family.total_quantity || 0}</p>
                           </div>
                         </div>
                       </div>
@@ -771,31 +770,33 @@ const Metrics = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Product Families List */}
+        {/* Product Families List - Usando mesma fonte de dados da tela de Relatórios */}
         <Card className="bg-card border-white/5">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Layers className="h-5 w-5 text-primary" />
-              Famílias de Produtos Cadastradas ({families.length})
+              Famílias de Produtos Identificadas ({familiesFromReport.length})
             </CardTitle>
+            <CardDescription>Famílias classificadas automaticamente a partir dos produtos dos jobs</CardDescription>
           </CardHeader>
           <CardContent>
-            {families.length === 0 ? (
+            {familiesFromReport.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                Nenhuma família cadastrada. Clique em "Criar Famílias Padrão" para começar.
+                Nenhuma família identificada. Importe jobs da Holdprint para classificar produtos automaticamente.
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {families.map(family => (
+                {familiesFromReport.map(family => (
                   <div
-                    key={family.id}
+                    key={family.name}
                     className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2"
                   >
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: family.color }}
+                      style={{ backgroundColor: family.color || '#3B82F6' }}
                     />
                     <span className="text-white text-sm">{family.name}</span>
+                    <span className="text-muted-foreground text-xs">({family.total_products || 0})</span>
                   </div>
                 ))}
               </div>
