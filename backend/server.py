@@ -59,148 +59,319 @@ SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://instalmonitor.preview.emergentagent.com')
 resend.api_key = RESEND_API_KEY
 
-# ============ CATÁLOGO DE PRODUTOS HOLDPRINT ============
-# Mapeamento de produtos para famílias - usado para associação automática
+# ============ CATÁLOGO OFICIAL DE PRODUTOS HOLDPRINT ============
+# Mapeamento exato de produtos para famílias baseado na planilha oficial
 
-PRODUCT_FAMILY_MAPPING = {
-    # Adesivos
-    "Adesivos": [
-        "adesivo", "vinil", "fachada adesivada", "fachada com vinil"
-    ],
-    # Lonas e Banners
-    "Lonas e Banners": [
-        "lona", "banner", "faixa", "empena", "faixa de gradil"
-    ],
-    # Chapas e Placas
-    "Chapas e Placas": [
-        "chapa", "placa", "acm", "acrílico", "mdf", "ps", "pvc", "polionda", 
-        "policarbonato", "petg", "compensado", "xps"
-    ],
-    # Estruturas Metálicas
-    "Estruturas Metálicas": [
-        "estrutura metálica", "estrutura metalica", "backdrop", "cavalete"
-    ],
-    # Tecidos
-    "Tecidos": [
-        "tecido", "bandeira", "wind banner"
-    ],
-    # Letras Caixa
-    "Letras Caixa": [
-        "letra caixa", "letra-caixa", "letras caixa"
-    ],
-    # Totens
-    "Totens": [
-        "totem"
-    ],
-    # Envelopamento
-    "Envelopamento": [
-        "envelopamento"
-    ],
-    # Painéis Luminosos
-    "Painéis Luminosos": [
-        "painel backlight", "painel luminoso", "backlight"
-    ],
-    # Serviços
-    "Serviços": [
-        "serviço", "serviços", "instalação", "entrega", "montagem", 
-        "pintura", "serralheria", "solda", "corte", "aplicação"
-    ],
-    # Materiais Promocionais
-    "Materiais Promocionais": [
-        "cartaz", "flyer", "folder", "panfleto", "imã", "marca-página"
-    ],
-    # Produtos Terceirizados
-    "Produtos Terceirizados": [
-        "terceirizado", "produto genérico"
-    ],
-    # Sublimação
-    "Sublimação": [
-        "sublimação", "sublimática", "sublimatico"
-    ],
-    # Impressão
-    "Impressão": [
-        "impressão uv", "impressão latex", "impressão solvente"
-    ],
-    # Display/PS
-    "Display/PS": [
-        "display", "móbile", "mobile", "orelha de monitor"
-    ],
-    # Fundação
-    "Fundação/Estrutura": [
-        "fundação", "sapata", "estrutura em madeira"
-    ]
+HOLDPRINT_PRODUCT_MAPPING = {
+    "Adesivo Bloqueado Impresso": "Adesivos",
+    "Adesivo Branco Impresso": "Adesivos",
+    "Adesivo Cast Impresso": "Adesivos",
+    "Adesivo Colorido Aplicado em Chapa": "Adesivos",
+    "Adesivo Colorido Envelopado": "Adesivos",
+    "Adesivo Colorido com Recorte Eletrônico": "Adesivos",
+    "Adesivo Eletrostático Impresso": "Adesivos",
+    "Adesivo Floor Door": "Adesivos",
+    "Adesivo Impresso Aplicado em Chapa": "Adesivos",
+    "Adesivo Impresso Envelopado": "Adesivos",
+    "Adesivo Impresso com Aplicação Externa": "Adesivos",
+    "Adesivo Impresso com Recorte Eletrônico": "Adesivos",
+    "Adesivo Jateado Aplicado": "Adesivos",
+    "Adesivo Jateado Impresso": "Adesivos",
+    "Adesivo Perfurado Impresso": "Adesivos",
+    "Adesivo Refletivo Impresso": "Adesivos",
+    "Adesivo Refletivo com Recorte Eletrônico": "Adesivos",
+    "Adesivo Translúcido Impresso": "Adesivos",
+    "Adesivo Translúcido com Recorte Eletrônico": "Adesivos",
+    "Adesivo Transparente Impresso": "Adesivos",
+    "Adesivo impresso laminado": "Adesivos",
+    "Adesivo jateado com recorte eletrônico": "Adesivos",
+    "Adesivo removível impresso": "Adesivos",
+    "Fachada adesivada - 3 Faces": "Adesivos",
+    "Fachada adesivada - Caixa": "Adesivos",
+    "Fachada adesivada - Plana": "Adesivos",
+    "Fachada com vinil colorido - 3 Faces": "Adesivos",
+    "Fachada com vinil colorido - Caixa": "Adesivos",
+    "Fachada com vinil colorido - Plana": "Adesivos",
+    "Vinil Adesivo Cast Colorido": "Adesivos",
+    "Fachada multi-chapas (face em acrílico) - 3 faces": "Acrílicos",
+    "Fachada multi-chapas (face em acrílico) - Caixa": "Acrílicos",
+    "Fachada multi-chapas - Plana": "Acrílicos",
+    "Banner em Lona": "Banners e Faixas",
+    "Faixa de gradil": "Banners e Faixas",
+    "Faixa em Lona com Impressão Digital": "Banners e Faixas",
+    "Chapa ACM com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa Acrílico com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa Compensado com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa MDF com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa PETG com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa PS com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa PVC Expandido com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa Polionda com Impressão Direta": "Chapas e placas com impressão",
+    "Chapa de policarbonato compacta com impressão direta": "Chapas e placas com impressão",
+    "Chapa ACM sem impressão": "Chapas e placas sem impressão",
+    "Chapa PETG sem impressão": "Chapas e placas sem impressão",
+    "Chapa PS sem Impressão": "Chapas e placas sem impressão",
+    "Chapa PVC expandido sem impressão": "Chapas e placas sem impressão",
+    "Chapa Polionda sem impressão": "Chapas e placas sem impressão",
+    "Chapa XPS sem impressão": "Chapas e placas sem impressão",
+    "Chapa acrílico sem impressão": "Chapas e placas sem impressão",
+    "Chapa de aço galvanizada sem impressão": "Chapas e placas sem impressão",
+    "Chapa de policarbonato alveolar sem impressão": "Chapas e placas sem impressão",
+    "Chapa de policarbonato compacta sem impressão": "Chapas e placas sem impressão",
+    "Envelopamento de Caminhão": "Envelopamento",
+    "Envelopamento de Carro": "Envelopamento",
+    "Envelopamento de Moto": "Envelopamento",
+    "Envelopamento de Ônibus": "Envelopamento",
+    "Envelopamentos Diversos": "Envelopamento",
+    "Fachada com chapa pintada galvanizada - Plana": "Estrutura metálica com chapa galvanizada",
+    "Fachada com chapa pintada galvanizada - 3 faces": "Estrutura metálica com chapa galvanizada",
+    "Fachada com chapa pintada galvanizada - Caixa": "Estrutura metálica com chapa galvanizada",
+    "Cavalete com lona impressa": "Estrutura metálica com lona",
+    "Fachada ACM com avanço + refletores": "Estruturas com ACM",
+    "Fachada ACM plana": "Estruturas com ACM",
+    "Estrutura em madeira para outdoor": "Estruturas em madeira com lona",
+    "Painel backlight em chapa ACM com vazado e acrílico": "Estruturas metálica com iluminação",
+    "Painel backlight em lona impressa": "Estruturas metálica com iluminação",
+    "Painel backlight em tecido impresso": "Estruturas metálica com iluminação",
+    "Painel luminoso - Adesivo impresso": "Estruturas metálica com iluminação",
+    "Painel luminoso - Recorte eletrônico": "Estruturas metálica com iluminação",
+    "Estrutura metálica para fachada": "Estruturas metálica com lona",
+    "Estrutura metálica para outdoor": "Estruturas metálica com lona",
+    "Backdrop em lona e estrutura metálica - pés de sustentação": "Estruturas metálicas com lona",
+    "Backdrop em tecido com estrutura metálica - pés laterais de sustentação": "Estruturas metálicas com tecido",
+    "Estrutura: Fundação | Sapata": "Fundação | Sapata",
+    "Produto com impressão látex": "Impressão Latex",
+    "Produto com impressão UV": "Impressão UV",
+    "Produto com impressão solvente": "Impressão solvente",
+    "Letra Caixa Plana": "Letras caixa",
+    "Letra Caixa Plana com Adesivo Impresso": "Letras caixa",
+    "Letra Caixa Plana com Vinil Colorido": "Letras caixa",
+    "Letra Caixa plana com Impressão Direta": "Letras caixa",
+    "Letra Caixa plana em ACM": "Letras caixa",
+    "Letra Caixa plana em Acrílico": "Letras caixa",
+    "Letra Caixa plana em Aço Escovado": "Letras caixa",
+    "Letra Caixa plana em Aço Galvanizado": "Letras caixa",
+    "Letra Caixa plana em Aço Inóx": "Letras caixa",
+    "Letra Caixa plana em Latão": "Letras caixa",
+    "Letra Caixa plana em MDF": "Letras caixa",
+    "Letra Caixa plana em PVC Expandido": "Letras caixa",
+    "Letra Caixa plana em XPS": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - ACM": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - PVC Expandido": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Acrílico": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Aço escovado": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Aço galvanizado": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Aço inóx": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Latão": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - MDF": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - Unidade": "Letras caixa",
+    "Letra caixa em relevo sem iluminação - XPS": "Letras caixa",
+    "Letra caixa termo-moldada com iluminação": "Letras caixa",
+    "Letra caixa termo-moldada sem iluminação": "Letras caixa",
+    "Letra caixa em relevo com iluminação direta - ACM": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Acrílico": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Aço Inóx": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Aço escovado": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Aço galvanizado": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Latão": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - MDF": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - PVC Expandido": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - Unidade": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação direta - XPS": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - ACM": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Acrílico": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Aço Escovado": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Aço Inóx": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Aço galvanizado": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Latão": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - MDF": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - PVC Expandido": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - Unidade": "Letras caixa iluminadas",
+    "Letra caixa em relevo com iluminação indireta - XPS": "Letras caixa iluminadas",
+    "Empena com Impressão Digital": "Lonas",
+    "Fachada em lona - 2 Faces": "Lonas",
+    "Fachada em lona - 3 Faces": "Lonas",
+    "Fachada em lona - Caixa": "Lonas",
+    "Fachada em lona - Plana": "Lonas",
+    "Lona Back Light com Impressão Digital": "Lonas e banners",
+    "Lona Banner com Impressão Digital": "Lonas e banners",
+    "Lona Blackout(B.O.) com Impressão Digital": "Lonas e banners",
+    "Lona Dupla Face com Impressão Digital": "Lonas e banners",
+    "Lona Front Light com Impressão Digital": "Lonas e banners",
+    "Lona Front Light com adesivo aplicado": "Lonas e banners",
+    "Lona Perfurada com Impressão Digital": "Lonas e banners",
+    "Cartaz (Couchê)": "Materiais promocionais e gráfica",
+    "Cartaz (Duplex)": "Materiais promocionais e gráfica",
+    "Flyer terceirizado": "Materiais promocionais e gráfica",
+    "Folder Personalizado": "Materiais promocionais e gráfica",
+    "Imã personalizado": "Materiais promocionais e gráfica",
+    "Marca-página personalizado": "Materiais promocionais e gráfica",
+    "Panfleto Personalizado": "Materiais promocionais e gráfica",
+    "Display em L - TESTE": "PS",
+    "Display em L com bolso - TESTE": "PS",
+    "Móbile em PS (1mm em 4x4)": "PS",
+    "Orelha de Monitor (4x4)": "PS",
+    "Produto com lista de custos manuais": "Produtos genéricos / configuráveis",
+    "Produto com lista de custos manuais com fórmula": "Produtos genéricos / configuráveis",
+    "Produto genérico | multi-medidas": "Produtos genéricos / configuráveis",
+    "Produto genérico | multi-medidas com impressão": "Produtos genéricos / configuráveis",
+    "Produto genérico | por metro quadrado": "Produtos genéricos / configuráveis",
+    "Produto genérico | por metro quadrado com impressão": "Produtos genéricos / configuráveis",
+    "Produto genérico | por unidade": "Produtos genéricos / configuráveis",
+    "Produto sem custos": "Produtos genéricos / configuráveis",
+    "Produto terceirizado (LxA)": "Produtos terceirizados",
+    "Produto terceirizado (unitário)": "Produtos terceirizados",
+    "Serviços - Aplicação de adesivo": "Serviços",
+    "Serviços - Corte": "Serviços",
+    "Serviços - Entrega (carro ou caminhão da empresa)": "Serviços",
+    "Serviços - Entrega com Uber": "Serviços",
+    "Serviços - Entrega com motoboy": "Serviços",
+    "Serviços - Entrega com transportadora": "Serviços",
+    "Serviços - Instalação": "Serviços",
+    "Serviços - Montagem de marcenaria": "Serviços",
+    "Serviços - Montagem elétrica": "Serviços",
+    "Serviços - Pintura": "Serviços",
+    "Serviços - Preparo para pintura": "Serviços",
+    "Serviços - Serralheria": "Serviços",
+    "Serviços - Solda de lona": "Serviços",
+    "Serviços – Aplicação de dupla-face": "Serviços",
+    "Produto com impressão sublimática - Grandes formatos": "Sublimação",
+    "Produto com impressão sublimática - Pequenos formatos": "Sublimação",
+    "Sublimação rolo a rolo": "Sublimação",
+    "Bandeira em Tecido com Impressão Sublimática": "Tecidos",
+    "Bandeira em tecido com Impressão Direta": "Tecidos",
+    "Faixa em Tecido com Impressão Direta": "Tecidos",
+    "Faixa em Tecido com Impressão Sublimática": "Tecidos",
+    "Tecido Backlight - Impressão 4x0": "Tecidos",
+    "Tecido Backlight - Impressão Sublimática": "Tecidos",
+    "Tecido Blockout - Impressão Sublimática": "Tecidos",
+    "Tecido Perfurado 4X0 - Impressão Sublimática": "Tecidos",
+    "Wind Banner - Impressão Direta": "Tecidos",
+    "Wind Banner - Impressão Sublimática": "Tecidos",
+}
+
+# Adicionar todos os Totens (64 produtos)
+TOTEM_TYPES = ["curvo", "especial", "formato L", "formato T invertido", "plano", "quadrado", "redondo", "triangular"]
+TOTEM_MATERIALS = ["ACM", "MDF", "PS", "PVC rígido", "acrílico", "aço galvanizado", "aço inóx", "papel"]
+for totem_type in TOTEM_TYPES:
+    for material in TOTEM_MATERIALS:
+        if material == "acrílico":
+            product_name = f"Totem {totem_type} em {material} (impressão direta)"
+        else:
+            product_name = f"Totem {totem_type} em {material} (Impressão Direta)"
+        HOLDPRINT_PRODUCT_MAPPING[product_name] = "Totens"
+
+# Lista de famílias oficiais com cores
+HOLDPRINT_FAMILIES = {
+    "Acrílicos": {"color": "#8B5CF6", "count": 3},
+    "Adesivos": {"color": "#EF4444", "count": 30},
+    "Banners e Faixas": {"color": "#F97316", "count": 3},
+    "Chapas e placas com impressão": {"color": "#EAB308", "count": 9},
+    "Chapas e placas sem impressão": {"color": "#A3A3A3", "count": 10},
+    "Envelopamento": {"color": "#06B6D4", "count": 5},
+    "Estrutura metálica com chapa galvanizada": {"color": "#64748B", "count": 3},
+    "Estrutura metálica com lona": {"color": "#22C55E", "count": 1},
+    "Estruturas com ACM": {"color": "#3B82F6", "count": 2},
+    "Estruturas em madeira com lona": {"color": "#92400E", "count": 1},
+    "Estruturas metálica com iluminação": {"color": "#FBBF24", "count": 5},
+    "Estruturas metálica com lona": {"color": "#22C55E", "count": 2},
+    "Estruturas metálicas com lona": {"color": "#22C55E", "count": 1},
+    "Estruturas metálicas com tecido": {"color": "#A855F7", "count": 1},
+    "Fundação | Sapata": {"color": "#78716C", "count": 1},
+    "Impressão Latex": {"color": "#EC4899", "count": 1},
+    "Impressão UV": {"color": "#EC4899", "count": 1},
+    "Impressão solvente": {"color": "#EC4899", "count": 1},
+    "Letras caixa": {"color": "#14B8A6", "count": 25},
+    "Letras caixa iluminadas": {"color": "#F59E0B", "count": 20},
+    "Lonas": {"color": "#F97316", "count": 5},
+    "Lonas e banners": {"color": "#F97316", "count": 7},
+    "Materiais promocionais e gráfica": {"color": "#8B5CF6", "count": 7},
+    "PS": {"color": "#6366F1", "count": 4},
+    "Produtos genéricos / configuráveis": {"color": "#9CA3AF", "count": 8},
+    "Produtos terceirizados": {"color": "#6B7280", "count": 2},
+    "Serviços": {"color": "#10B981", "count": 14},
+    "Sublimação": {"color": "#DB2777", "count": 3},
+    "Tecidos": {"color": "#A855F7", "count": 10},
+    "Totens": {"color": "#0EA5E9", "count": 64},
+}
+
+# Palavras-chave para classificação por similaridade (fallback)
+FAMILY_KEYWORDS = {
+    "Adesivos": ["adesivo", "vinil", "fachada adesivada", "fachada com vinil"],
+    "Acrílicos": ["acrílico", "acrilico", "multi-chapas"],
+    "Banners e Faixas": ["banner", "faixa", "gradil"],
+    "Chapas e placas com impressão": ["chapa", "placa", "impressão direta", "com impressão"],
+    "Chapas e placas sem impressão": ["chapa", "placa", "sem impressão"],
+    "Envelopamento": ["envelopamento", "envelopar"],
+    "Estrutura metálica com chapa galvanizada": ["chapa galvanizada", "galvanizado"],
+    "Estrutura metálica com lona": ["cavalete", "estrutura metálica"],
+    "Estruturas com ACM": ["fachada acm", "acm com avanço"],
+    "Estruturas em madeira com lona": ["madeira", "outdoor madeira"],
+    "Estruturas metálica com iluminação": ["backlight", "luminoso", "iluminação"],
+    "Estruturas metálica com lona": ["estrutura metálica", "outdoor"],
+    "Estruturas metálicas com lona": ["backdrop", "estrutura metálica"],
+    "Estruturas metálicas com tecido": ["backdrop tecido"],
+    "Fundação | Sapata": ["fundação", "sapata"],
+    "Impressão Latex": ["látex", "latex"],
+    "Impressão UV": ["uv"],
+    "Impressão solvente": ["solvente"],
+    "Letras caixa": ["letra caixa", "letras caixa", "sem iluminação"],
+    "Letras caixa iluminadas": ["letra caixa", "iluminação direta", "iluminação indireta"],
+    "Lonas": ["empena", "fachada em lona"],
+    "Lonas e banners": ["lona", "front light", "back light", "blackout"],
+    "Materiais promocionais e gráfica": ["cartaz", "flyer", "folder", "panfleto", "imã", "marca-página"],
+    "PS": ["display", "móbile", "mobile", "orelha de monitor"],
+    "Produtos genéricos / configuráveis": ["genérico", "configurável", "sem custos"],
+    "Produtos terceirizados": ["terceirizado"],
+    "Serviços": ["serviço", "serviços", "instalação", "entrega", "montagem", "pintura", "serralheria", "solda", "corte", "aplicação"],
+    "Sublimação": ["sublimação", "sublimática", "sublimatico"],
+    "Tecidos": ["tecido", "bandeira", "wind banner"],
+    "Totens": ["totem"],
 }
 
 def classify_product_to_family(product_name: str) -> tuple:
     """
     Classifica um produto em uma família baseado no nome.
+    Usa primeiro correspondência exata, depois similaridade.
     Retorna (family_name, confidence_score)
     """
     if not product_name:
         return (None, 0)
     
+    # 1. Tentar correspondência exata
+    if product_name in HOLDPRINT_PRODUCT_MAPPING:
+        return (HOLDPRINT_PRODUCT_MAPPING[product_name], 100)
+    
+    # 2. Tentar correspondência case-insensitive
     product_lower = product_name.lower()
+    for mapped_product, family in HOLDPRINT_PRODUCT_MAPPING.items():
+        if mapped_product.lower() == product_lower:
+            return (family, 95)
     
-    # Mapeamento com prioridade (mais específico primeiro)
-    priority_mapping = [
-        # Letras Caixa - verificar antes de outros
-        ("Letras Caixa", ["letra caixa", "letra-caixa", "letras caixa"]),
-        # Totens
-        ("Totens", ["totem"]),
-        # Envelopamento
-        ("Envelopamento", ["envelopamento", "envelopar"]),
-        # Painéis Luminosos
-        ("Painéis Luminosos", ["painel backlight", "painel luminoso", "backlight", "lightbox"]),
-        # Tecidos
-        ("Tecidos", ["tecido", "bandeira", "wind banner"]),
-        # Estruturas Metálicas
-        ("Estruturas Metálicas", ["estrutura metálica", "estrutura metalica", "backdrop", "cavalete"]),
-        # Lonas e Banners
-        ("Lonas e Banners", ["lona", "banner", "faixa", "empena"]),
-        # Adesivos - depois de lonas para não pegar "lona com adesivo"
-        ("Adesivos", ["adesivo", "vinil", "fachada adesivada", "fachada com vinil"]),
-        # Chapas e Placas
-        ("Chapas e Placas", ["chapa", "placa", "acm", "acrílico", "acrilico", "mdf", " ps ", "pvc", "polionda", 
-                           "policarbonato", "petg", "compensado", "xps"]),
-        # Serviços
-        ("Serviços", ["serviço", "serviços", "instalação", "instalacao", "entrega", "montagem", 
-                     "pintura", "serralheria", "solda", "corte", "aplicação", "aplicacao"]),
-        # Materiais Promocionais
-        ("Materiais Promocionais", ["cartaz", "flyer", "folder", "panfleto", "imã", "marca-página"]),
-        # Sublimação
-        ("Sublimação", ["sublimação", "sublimática", "sublimatico", "sublimacao"]),
-        # Impressão
-        ("Impressão", ["impressão uv", "impressão latex", "impressão solvente", "impresso"]),
-        # Display/PS
-        ("Display/PS", ["display", "móbile", "mobile", "orelha de monitor"]),
-        # Produtos Terceirizados
-        ("Produtos Terceirizados", ["terceirizado", "produto genérico"]),
-        # Fundação
-        ("Fundação/Estrutura", ["fundação", "sapata", "estrutura em madeira"]),
-    ]
+    # 3. Tentar correspondência parcial (produto contém o nome mapeado ou vice-versa)
+    for mapped_product, family in HOLDPRINT_PRODUCT_MAPPING.items():
+        mapped_lower = mapped_product.lower()
+        if mapped_lower in product_lower or product_lower in mapped_lower:
+            # Calcular score baseado na similaridade
+            similarity = min(len(product_lower), len(mapped_lower)) / max(len(product_lower), len(mapped_lower))
+            score = 70 + (similarity * 25)
+            return (family, round(score, 1))
     
+    # 4. Usar palavras-chave para classificação por similaridade
     best_match = None
     best_score = 0
     
-    for family_name, keywords in priority_mapping:
+    for family_name, keywords in FAMILY_KEYWORDS.items():
         for keyword in keywords:
             if keyword.lower() in product_lower:
-                # Score baseado no tamanho do match e posição
                 keyword_len = len(keyword)
                 product_len = len(product_name)
-                
-                # Score base: proporção do keyword no nome
                 base_score = (keyword_len / product_len) * 100
                 
-                # Bonus se keyword está no início
                 if product_lower.startswith(keyword.lower()):
-                    base_score += 30
+                    base_score += 20
                 
-                # Bonus por match exato de palavra
-                if keyword.lower() == product_lower:
-                    base_score = 100
-                
-                score = min(base_score, 100)
+                score = min(base_score, 65)  # Max 65 para classificação por keyword
                 
                 if score > best_score:
                     best_score = score
@@ -209,8 +380,7 @@ def classify_product_to_family(product_name: str) -> tuple:
     if best_match:
         return (best_match, round(best_score, 1))
     
-    return ("Outros", 10)  # Família genérica com baixa confiança
-
+    return ("Não classificado", 0)
 def extract_product_measures(description: str) -> dict:
     """
     Extrai medidas (largura, altura, cópias) da descrição HTML do produto.
