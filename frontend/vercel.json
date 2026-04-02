@@ -1,15 +1,18 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" }
-      ]
-    }
-  ]
+    "rewrites": [
+          { "source": "/api/:path*", "destination": "https://instalmonitor.onrender.com/api/:path*" },
+          { "source": "/health", "destination": "https://instalmonitor.onrender.com/health" },
+          { "source": "/uploads/:path*", "destination": "https://instalmonitor.onrender.com/uploads/:path*" },
+          { "source": "/(.*)", "destination": "/" }
+    ],
+    "headers": [
+          {
+                  "source": "/(.*)",
+                  "headers": [
+                            { "key": "X-Content-Type-Options", "value": "nosniff" },
+                            { "key": "X-Frame-Options", "value": "DENY" },
+                            { "key": "X-XSS-Protection", "value": "1; mode=block" }
+                  ]
+          }
+    ]
 }
